@@ -1,41 +1,39 @@
 <?php
-  /**
-  * Requires the "PHP Email Form" library
-  * The "PHP Email Form" library is available only in the pro version of the template
-  * The library should be uploaded to: vendor/php-email-form/php-email-form.php
-  * For more info and help: https://bootstrapmade.com/php-email-form/
-  */
-
-  // Replace contact@example.com with your real receiving email address
-  $receiving_email_address = 'contact@example.com';
-
+// require 'SmtpMailer.php';
   if( file_exists($php_email_form = '../assets/vendor/php-email-form/php-email-form.php' )) {
     include( $php_email_form );
   } else {
     die( 'Unable to load the "PHP Email Form" Library!');
   }
 
-  $contact = new PHP_Email_Form;
-  $contact->ajax = true;
-  
-  $contact->to = $receiving_email_address;
-  $contact->from_name = $_POST['name'];
-  $contact->from_email = $_POST['email'];
-  $contact->subject = $_POST['subject'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = htmlspecialchars($_POST['name']);
+    $email = htmlspecialchars($_POST['email']);
+    $message = htmlspecialchars($_POST['message']);
 
-  // Uncomment below code if you want to use SMTP to send emails. You need to enter your correct SMTP credentials
-  /*
-  $contact->smtp = array(
-    'host' => 'example.com',
-    'username' => 'example',
-    'password' => 'pass',
-    'port' => '587'
-  );
-  */
+    $smtpHost = 'smtp-mail.outlook.com'; // Replace with your SMTP host
+    $smtpUsername = 'james@njligames.com'; // Replace with your SMTP username
+    $smtpPassword = getenv('SSH');
+    $smtpPort = 587; // Replace with your SMTP port (typically 587 for TLS, 465 for SSL)
+    $smtpEncryption = 'tls'; // 'tls' or 'ssl'
 
-  $contact->add_message( $_POST['name'], 'From');
-  $contact->add_message( $_POST['email'], 'Email');
-  $contact->add_message( $_POST['message'], 'Message', 10);
+    $mailer = new SmtpMailer($smtpHost, $smtpUsername, $smtpPassword, $smtpPort, $smtpEncryption);
 
-  echo $contact->send();
+    $from = 'webmaster@example.com'; // Replace with the sender's email address
+    $to = 'jamesfolk1@gmail.com'; // Replace with the recipient's email address
+    $subject = 'New Contact Form Submission';
+    $body = "<h1>Contact Form Submission</h1>
+             <p><strong>Name:</strong> $name</p>
+             <p><strong>Email:</strong> $email</p>
+             <p><strong>Message:</strong></p>
+             <p>$message</p>";
+
+    if ($mailer->sendEmail($from, $to, $subject, $body)) {
+        echo 'Email sent successfully!';
+    } else {
+        echo 'Failed to send email.';
+    }
+} else {
+    echo 'Invalid request method.';
+}
 ?>
