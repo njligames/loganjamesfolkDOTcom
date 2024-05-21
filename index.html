@@ -153,7 +153,7 @@
             <p>
               Logan James Folk embodies the essence of a dynamic young talent,
               igniting stages and captivating screens with an unparalleled
-              passion for performance. From his captivating presence on screen
+              passion for perfcormance. From his captivating presence on screen
               to his commanding presence on stage, Logan's versatility knows no
               bounds. Currently, he's gearing up for a supporting role in an
               upcoming film by Michael Palance Premier Plus, promising audiences
@@ -1351,7 +1351,7 @@
             </div>
 
             <div class="col-lg-8 mt-5 mt-lg-0">
-              <form
+              <!-- <form
                 action="forms/contact.php"
                 method="post"
                 role="form"
@@ -1393,6 +1393,60 @@
                   <textarea
                     class="form-control"
                     name="message"
+                    rows="5"
+                    placeholder="Message"
+                    required
+                  ></textarea>
+                </div>
+                <div class="my-3">
+                  <div class="loading">Loading</div>
+                  <div class="error-message"></div>
+                  <div class="sent-message">
+                    Your message has been sent. Thank you!
+                  </div>
+                </div>
+                <div class="text-center">
+                  <button type="submit">Send Message</button>
+                </div>
+              </form> -->
+              <form id="contactForm" class="php-email-form">
+                <div class="row">
+                  <div class="col-md-6 form-group">
+                    <input
+                      type="text"
+                      name="name"
+                      class="form-control"
+                      id="name"
+                      placeholder="Your Name"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 form-group mt-3 mt-md-0">
+                    <input
+                      type="email"
+                      class="form-control"
+                      name="email"
+                      id="email"
+                      placeholder="Your Email"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="form-group mt-3">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="subject"
+                    id="subject"
+                    placeholder="Subject"
+                    required
+                  />
+                </div>
+                <div class="form-group mt-3">
+                  <textarea
+                    class="form-control"
+                    name="message"
+                    id="message"
                     rows="5"
                     placeholder="Message"
                     required
@@ -1491,9 +1545,59 @@
     <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="assets/vendor/typed.js/typed.umd.js"></script>
     <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
-    <script src="assets/vendor/php-email-form/validate.js"></script>
+    <!-- <script src="assets/vendor/php-email-form/validate.js"></script> -->
 
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
+    <script>
+      document
+        .getElementById("contactForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const name = document.getElementById("name").value;
+          const fromEmail = document.getElementById("email").value;
+          const subject = document.getElementById("subject").value;
+          const message = document.getElementById("message").value;
+
+          const data = {
+            from_email: fromEmail,
+            to_email: "recipient_email@example.com", // Replace with your recipient email address
+            subject: subject,
+            html_content: `<p><strong>Name:</strong> ${name}</p><p>${message}</p>`,
+          };
+
+          const loading = document.querySelector(".loading");
+          const errorMessage = document.querySelector(".error-message");
+          const sentMessage = document.querySelector(".sent-message");
+
+          loading.style.display = "block";
+          errorMessage.style.display = "none";
+          sentMessage.style.display = "none";
+
+          fetch("https://flaskemail.onrender.com/send_mail", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              loading.style.display = "none";
+              if (data.error) {
+                errorMessage.textContent = "Error: " + data.error;
+                errorMessage.style.display = "block";
+              } else {
+                sentMessage.style.display = "block";
+              }
+            })
+            .catch((error) => {
+              loading.style.display = "none";
+              errorMessage.textContent = "Error: " + error;
+              errorMessage.style.display = "block";
+            });
+        });
+    </script>
   </body>
 </html>
